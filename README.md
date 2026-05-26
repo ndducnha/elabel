@@ -1,42 +1,79 @@
-# eLabel Static Only
+# eLabel + Google Sheet Tracking
 
-Bản này chạy 100% trên GitHub Pages, không cần backend.
+## Mục tiêu
 
-## File
+- verify.html chạy trên GitHub Pages
+- mọi người quét QR
+- dữ liệu gửi về Google Sheet trung tâm
+- dashboard xem toàn bộ lượt quét
 
-- `verify.html`: trang người dùng quét QR.
-- `dashboard.html`: trang xem dữ liệu local.
-- `README.md`: hướng dẫn.
+## BƯỚC 1 — Upload GitHub
 
-## Cách dùng trên GitHub Pages
+Upload:
+- verify.html
+- dashboard.html
 
-1. Upload `verify.html` và `dashboard.html` lên repo.
-2. Vào Settings → Pages.
-3. Chọn Deploy from branch.
-4. Branch: main.
-5. Folder: /root.
-6. Save.
+Bật:
+Settings → Pages → Deploy from branch → main/root
 
-Link verify mẫu:
+Link:
 
 ```txt
 https://ndducnha.github.io/elabel/verify.html?id=8938500000271&token=abc123
 ```
 
-Link dashboard:
+## BƯỚC 2 — Tạo Google Sheet
 
-```txt
-https://ndducnha.github.io/elabel/dashboard.html
+1. Tạo Google Sheet mới
+2. Extensions → Apps Script
+3. Paste code trong apps-script.js
+4. Deploy → New Deployment
+5. Type: Web App
+6. Execute as: Me
+7. Who has access: Anyone
+8. Deploy
+9. Copy Web App URL
+
+## BƯỚC 3 — Dán URL vào verify.html
+
+Sửa:
+
+```js
+const GOOGLE_SCRIPT_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE";
 ```
 
-## Quan trọng
+## BƯỚC 4 — Dashboard
 
-Vì không có backend:
+Trong Google Sheet:
 
-- Không thu được IP thật.
-- Không có database chung.
-- Dashboard chỉ thấy dữ liệu local trên cùng trình duyệt.
-- Người khác quét QR trên điện thoại của họ thì dữ liệu nằm trên điện thoại của họ, không tự chạy về máy admin.
-- Verify rule bị lộ trong source code, chỉ phù hợp demo UI.
+File → Share → Publish to web
 
-Muốn thu dữ liệu tập trung giống Google Analytics thì bắt buộc cần backend/serverless/API.
+Copy link publish.
+
+Dán vào:
+
+```html
+<iframe src="PASTE_GOOGLE_SHEET_PUBLISH_LINK_HERE"></iframe>
+```
+
+## Thu được
+
+- Thời gian
+- Product ID
+- Token
+- Product info
+- URL
+- Referrer
+- User Agent
+- Language
+- Platform
+- Screen size
+- Viewport
+- Timezone
+- Fingerprint
+
+## Không thu được nếu không có backend riêng
+
+- IP thật
+- GPS chính xác (trừ khi xin quyền)
+- Country/city chính xác

@@ -1,341 +1,209 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>e-Label Static Verify</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eLabel Verify</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #eef2f7;
-      color: #111827;
-    }
-
-    .container {
-      max-width: 520px;
-      margin: 24px auto;
-      background: white;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 18px 42px rgba(29, 49, 114, 0.10);
-    }
-
-    .header {
-      padding: 16px;
-      border-bottom: 1px solid #e4e8f1;
-      font-weight: 800;
-      color: #2340aa;
-      font-size: 15px;
-    }
-
-    .hero {
-      margin: 16px;
-      padding: 18px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #1A237E 0%, #3F51B5 100%);
-      color: white;
-    }
-
-    .code {
-      display: inline-block;
-      background: #ecfdf5;
-      color: #0ea371;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-family: monospace;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .status {
-      margin: 16px;
-      padding: 18px;
-      border-radius: 14px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .success {
-      background: #ecfdf5;
-      color: #047857;
-    }
-
-    .fail {
-      background: #fef2f2;
-      color: #b91c1c;
-    }
-
-    .section {
-      border-top: 1px solid #e4e8f1;
-      padding: 16px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 130px 1fr;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid #edf0f6;
-      font-size: 14px;
-    }
-
-    .label {
-      color: #6f768a;
-    }
-
-    .value {
-      font-weight: 600;
-      word-break: break-word;
-    }
-
-    .buttons {
-      padding: 16px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      border-top: 1px solid #e4e8f1;
-    }
-
-    a, button {
-      border: 0;
-      border-radius: 10px;
-      background: #111827;
-      color: white;
-      padding: 10px 13px;
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    .muted {
-      color: #6b7280;
-      font-size: 13px;
-      line-height: 1.5;
-      padding: 0 16px 16px;
-    }
+    body{font-family:Arial,sans-serif;background:#eef2f7;margin:0;color:#111827}
+    .wrap{max-width:560px;margin:30px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 18px 42px rgba(29,49,114,.1)}
+    .header{padding:16px;font-weight:800;color:#2340aa;border-bottom:1px solid #e4e8f1}
+    .hero{margin:16px;padding:20px;border-radius:16px;background:linear-gradient(135deg,#1A237E 0%,#3F51B5 100%);color:#fff}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#ecfdf5;color:#0ea371;font-weight:700;font-family:monospace}
+    .status{margin:16px;padding:18px;border-radius:14px;text-align:center;font-size:24px;font-weight:800}
+    .ok{background:#ecfdf5;color:#047857}.fail{background:#fef2f2;color:#b91c1c}
+    .section{padding:16px;border-top:1px solid #e4e8f1}
+    .row{display:grid;grid-template-columns:130px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #edf0f6;font-size:14px}
+    .label{color:#6b7280}.value{font-weight:600;word-break:break-word}
+    .small{padding:0 16px 16px;color:#6b7280;font-size:13px;line-height:1.5}
   </style>
 </head>
 <body>
-  <main class="container">
-    <div class="header">HỆ THỐNG NHÃN ĐIỆN TỬ QUỐC GIA</div>
+<div class="wrap">
+  <div class="header">HỆ THỐNG NHÃN ĐIỆN TỬ</div>
 
-    <section class="hero">
-      <div class="code" id="productCode">8938500000271</div>
-      <div style="font-size:13px;opacity:.72">Vcyber</div>
-      <h1 id="productName" style="margin:6px 0 8px">Sữa Vina Export</h1>
-      <div style="font-size:13px">Thực phẩm · Hàng hóa rủi ro thấp</div>
-    </section>
+  <div class="hero">
+    <div class="badge" id="productId">8938500000271</div>
+    <div style="margin-top:8px;font-size:13px;opacity:.7">Vcyber</div>
+    <h1 id="productName">Sữa Vina Export</h1>
+    <div>Thực phẩm · Hàng hóa rủi ro thấp</div>
+  </div>
 
-    <div id="status" class="status success">✅ Verify thành công</div>
+  <div id="status" class="status ok">✅ Verify thành công</div>
 
-    <section class="section">
-      <h3>Thông tin sản phẩm</h3>
-      <div id="productRows"></div>
-    </section>
+  <div class="section">
+    <h3>Thông tin sản phẩm</h3>
+    <div id="productInfo"></div>
+  </div>
 
-    <section class="section">
-      <h3>Thông tin người quét đã ghi nhận trên máy này</h3>
-      <div id="visitorRows"></div>
-    </section>
+  <div class="section">
+    <h3>Thông tin người quét</h3>
+    <div id="visitorInfo"></div>
+  </div>
 
-    <div class="buttons">
-      <a href="./dashboard.html">Xem dashboard local</a>
-      <button onclick="downloadThisEvent()">Tải event JSON</button>
-      <button onclick="clearLocalLogs()">Xóa log local</button>
+  <div class="small">
+    Dữ liệu quét sẽ được gửi về Google Sheet trung tâm.
+  </div>
+</div>
+
+<script>
+/*
+  BƯỚC 1:
+  Thay link bên dưới bằng URL Apps Script của anh.
+
+  Ví dụ:
+  https://script.google.com/macros/s/AKfycbxxxxxxxx/exec
+*/
+
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLgsFriCtx04l6oMZvu59r2ALDPyCa4-pAEteb7pdx_JCMJMN7e2QXJT5nsVrTA6dr/exec";
+
+const PRODUCT = {
+  productName: "Sữa Vina Export",
+  productId: "8938500000271",
+  category: "Thực phẩm",
+  riskLevel: "Hàng hóa rủi ro thấp",
+  responsibleCompany: "Công ty Cổ phần Sữa Vina",
+  responsibleAddress: "88 Đại lộ Sữa, Quận 1, TP.HCM",
+  origin: "Vietnam",
+  ingredients: "Sugar (45%), full-cream milk powder (28%), vegetable oil (10%), water.",
+  warning: "Cool, dry place. Refrigerate after opening.",
+  usage: "Coffee, baking, desserts. Once opened, use within 5 days.",
+  storage: "Cool, dry place. Refrigerate after opening."
+};
+
+function qp(name){
+  return new URL(location.href).searchParams.get(name);
+}
+
+function esc(s){
+  return String(s ?? "").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+async function sha256(text){
+  const data=new TextEncoder().encode(text);
+  const hash=await crypto.subtle.digest("SHA-256",data);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+async function collectInfo(){
+  const ua=navigator.userAgent||"";
+  const raw=[
+    ua,
+    navigator.language,
+    navigator.platform,
+    screen.width,
+    screen.height,
+    devicePixelRatio,
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  ].join("|");
+
+  return {
+    url:location.href,
+    referrer:document.referrer,
+    title:document.title,
+    userAgent:ua,
+    language:navigator.language,
+    languages:navigator.languages,
+    platform:navigator.platform,
+    vendor:navigator.vendor,
+    cookieEnabled:navigator.cookieEnabled,
+    doNotTrack:navigator.doNotTrack,
+    online:navigator.onLine,
+    screenWidth:screen.width,
+    screenHeight:screen.height,
+    viewportWidth:innerWidth,
+    viewportHeight:innerHeight,
+    timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timezoneOffset:new Date().getTimezoneOffset(),
+    clientTime:new Date().toISOString(),
+    fingerprint:await sha256(raw)
+  };
+}
+
+function verify(productId, token){
+  const validTokens=["abc123","demo-token","token-san-pham-001"];
+  return productId===PRODUCT.productId && validTokens.includes(token);
+}
+
+function renderRows(id, rows){
+  document.getElementById(id).innerHTML=rows.map(([k,v])=>`
+    <div class="row">
+      <div class="label">${esc(k)}</div>
+      <div class="value">${esc(v)}</div>
     </div>
+  `).join("");
+}
 
-    <div class="muted">
-      Bản static 100%: dữ liệu được lưu bằng localStorage trên chính trình duyệt này.
-      Không có backend nên dashboard không thể nhận dữ liệu từ máy người khác.
-    </div>
-  </main>
+async function sendToGoogleSheet(payload){
+  if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_")){
+    console.warn("Google Script URL not configured");
+    return;
+  }
 
-  <script>
-    const PRODUCT_INFO = {
-      productName: "Sữa Vina Export",
-      productId: "8938500000271",
-      category: "Thực phẩm",
-      riskLevel: "Hàng hóa rủi ro thấp",
-      responsibleCompany: "Công ty Cổ phần Sữa Vina",
-      responsibleAddress: "88 Đại lộ Sữa, Quận 1, TP.HCM",
-      origin: "Vietnam",
-      brand: "—",
-      supplier: "—",
-      targetMarket: "—",
-      description: "—",
-      quantity: "330 kcal",
-      ingredients: "Sugar (45%), full-cream milk powder (28%), vegetable oil (10%), water.",
-      warning: "Cool, dry place. Refrigerate after opening.",
-      usage: "Coffee, baking, desserts. Once opened, use within 5 days.",
-      storage: "Cool, dry place. Refrigerate after opening.",
-      updatedAt: "25/05/2026",
-      version: "v1"
-    };
+  try{
+    await fetch(GOOGLE_SCRIPT_URL,{
+      method:"POST",
+      body:JSON.stringify(payload),
+      headers:{
+        "Content-Type":"application/json"
+      },
+      mode:"no-cors"
+    });
+  }catch(err){
+    console.error(err);
+  }
+}
 
-    let currentEvent = null;
+async function main(){
+  const productId=qp("id")||PRODUCT.productId;
+  const token=qp("token")||"";
+  const verified=verify(productId,token);
 
-    function qp(name) {
-      return new URL(location.href).searchParams.get(name);
-    }
+  document.getElementById("productId").textContent=productId;
+  document.getElementById("productName").textContent=PRODUCT.productName;
 
-    function esc(s) {
-      return String(s ?? "").replace(/[&<>"']/g, m => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-      }[m]));
-    }
+  const status=document.getElementById("status");
+  status.className="status "+(verified?"ok":"fail");
+  status.textContent=verified?"✅ Verify thành công":"❌ Verify thất bại";
 
-    async function sha256(text) {
-      const data = new TextEncoder().encode(text);
-      const hash = await crypto.subtle.digest("SHA-256", data);
-      return Array.from(new Uint8Array(hash))
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-    }
+  const visitor=await collectInfo();
 
-    async function collectVisitorInfo() {
-      const ua = navigator.userAgent || "";
-      const raw = [
-        ua,
-        navigator.language,
-        navigator.platform,
-        screen.width,
-        screen.height,
-        window.devicePixelRatio,
-        Intl.DateTimeFormat().resolvedOptions().timeZone
-      ].join("|");
+  const payload={
+    savedAt:new Date().toISOString(),
+    verified,
+    productId,
+    token,
+    productInfo:PRODUCT,
+    visitorInfo:visitor
+  };
 
-      return {
-        url: location.href,
-        referrer: document.referrer,
-        title: document.title,
-        userAgent: ua,
-        language: navigator.language,
-        languages: navigator.languages,
-        platform: navigator.platform,
-        vendor: navigator.vendor,
-        cookieEnabled: navigator.cookieEnabled,
-        doNotTrack: navigator.doNotTrack,
-        online: navigator.onLine,
-        screenWidth: screen.width,
-        screenHeight: screen.height,
-        availWidth: screen.availWidth,
-        availHeight: screen.availHeight,
-        colorDepth: screen.colorDepth,
-        pixelRatio: window.devicePixelRatio,
-        viewportWidth: innerWidth,
-        viewportHeight: innerHeight,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        timezoneOffset: new Date().getTimezoneOffset(),
-        clientTime: new Date().toISOString(),
-        fingerprint: await sha256(raw)
-      };
-    }
+  await sendToGoogleSheet(payload);
 
-    function verifyStatic(productId, token) {
-      /*
-        Static verify rule:
-        - Nếu token có trong danh sách này thì OK.
-        - Vì chạy static nên rule này lộ trong source code.
-      */
-      const validTokens = ["abc123", "demo-token", "token-san-pham-001"];
-      return productId === PRODUCT_INFO.productId && validTokens.includes(token);
-    }
+  renderRows("productInfo",[
+    ["Tên sản phẩm",PRODUCT.productName],
+    ["Mã định danh",productId],
+    ["Doanh nghiệp",PRODUCT.responsibleCompany],
+    ["Địa chỉ",PRODUCT.responsibleAddress],
+    ["Xuất xứ",PRODUCT.origin],
+    ["Phân loại",PRODUCT.category],
+    ["Mức rủi ro",PRODUCT.riskLevel],
+    ["Thành phần",PRODUCT.ingredients],
+    ["Cảnh báo",PRODUCT.warning]
+  ]);
 
-    function saveEvent(event) {
-      const key = "elabel_verify_events";
-      const old = JSON.parse(localStorage.getItem(key) || "[]");
-      old.unshift(event);
-      localStorage.setItem(key, JSON.stringify(old.slice(0, 1000)));
-    }
+  renderRows("visitorInfo",[
+    ["Thời gian",visitor.clientTime],
+    ["Thiết bị",visitor.platform],
+    ["Ngôn ngữ",visitor.language],
+    ["Timezone",visitor.timezone],
+    ["Màn hình",`${visitor.screenWidth}x${visitor.screenHeight}`],
+    ["Fingerprint",visitor.fingerprint]
+  ]);
+}
 
-    function renderRows(id, rows) {
-      document.getElementById(id).innerHTML = rows.map(([k, v]) => `
-        <div class="row">
-          <div class="label">${esc(k)}</div>
-          <div class="value">${esc(v)}</div>
-        </div>
-      `).join("");
-    }
-
-    async function main() {
-      const productId = qp("id") || PRODUCT_INFO.productId;
-      const token = qp("token") || "";
-      const verified = verifyStatic(productId, token);
-
-      document.getElementById("productName").textContent = PRODUCT_INFO.productName;
-      document.getElementById("productCode").textContent = productId;
-
-      const status = document.getElementById("status");
-      status.className = "status " + (verified ? "success" : "fail");
-      status.textContent = verified ? "✅ Verify thành công" : "❌ Verify thất bại";
-
-      const visitorInfo = await collectVisitorInfo();
-
-      currentEvent = {
-        eventId: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        verified,
-        productId,
-        token,
-        productInfo: PRODUCT_INFO,
-        visitorInfo,
-        savedAt: new Date().toISOString()
-      };
-
-      saveEvent(currentEvent);
-
-      renderRows("productRows", [
-        ["Tên sản phẩm", PRODUCT_INFO.productName],
-        ["Mã định danh", productId],
-        ["Doanh nghiệp", PRODUCT_INFO.responsibleCompany],
-        ["Địa chỉ", PRODUCT_INFO.responsibleAddress],
-        ["Xuất xứ", PRODUCT_INFO.origin],
-        ["Phân loại", PRODUCT_INFO.category],
-        ["Mức rủi ro", PRODUCT_INFO.riskLevel],
-        ["Định lượng", PRODUCT_INFO.quantity],
-        ["Thành phần", PRODUCT_INFO.ingredients],
-        ["Cảnh báo", PRODUCT_INFO.warning],
-        ["Hướng dẫn sử dụng", PRODUCT_INFO.usage],
-        ["Bảo quản", PRODUCT_INFO.storage]
-      ]);
-
-      renderRows("visitorRows", [
-        ["Thời gian", visitorInfo.clientTime],
-        ["URL", visitorInfo.url],
-        ["Referrer", visitorInfo.referrer || "—"],
-        ["Thiết bị", visitorInfo.platform],
-        ["Trình duyệt", visitorInfo.userAgent],
-        ["Ngôn ngữ", visitorInfo.language],
-        ["Màn hình", `${visitorInfo.screenWidth}x${visitorInfo.screenHeight}`],
-        ["Viewport", `${visitorInfo.viewportWidth}x${visitorInfo.viewportHeight}`],
-        ["Timezone", visitorInfo.timezone],
-        ["Fingerprint", visitorInfo.fingerprint]
-      ]);
-    }
-
-    function downloadThisEvent() {
-      const blob = new Blob([JSON.stringify(currentEvent, null, 2)], {
-        type: "application/json"
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "verify-event.json";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function clearLocalLogs() {
-      localStorage.removeItem("elabel_verify_events");
-      alert("Đã xóa log local trên trình duyệt này.");
-    }
-
-    main();
-  </script>
+main();
+</script>
 </body>
 </html>
