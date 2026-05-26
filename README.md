@@ -1,111 +1,42 @@
-# GitHub Verify Tracking Demo
+# eLabel Static Only
 
-## Cấu trúc
+Bản này chạy 100% trên GitHub Pages, không cần backend.
 
-- `verify.html`: đưa lên GitHub Pages, dùng cho QR.
-- `dashboard.html`: đưa lên GitHub Pages, dùng để xem dữ liệu collect.
-- `server.js`: backend Node.js để nhận verify event và trả kết quả.
-- `package.json`: chạy backend.
+## File
 
-## 1. Tạo GitHub repo
+- `verify.html`: trang người dùng quét QR.
+- `dashboard.html`: trang xem dữ liệu local.
+- `README.md`: hướng dẫn.
 
-1. Vào GitHub → New repository.
-2. Đặt tên ví dụ: `elabel-verify-demo`.
-3. Upload `verify.html` và `dashboard.html` lên repo.
-4. Vào Settings → Pages.
-5. Source: Deploy from branch.
-6. Branch: `main`, folder `/root`.
-7. Save.
+## Cách dùng trên GitHub Pages
 
-Link sẽ có dạng:
+1. Upload `verify.html` và `dashboard.html` lên repo.
+2. Vào Settings → Pages.
+3. Chọn Deploy from branch.
+4. Branch: main.
+5. Folder: /root.
+6. Save.
 
-```txt
-https://USERNAME.github.io/elabel-verify-demo/verify.html
-https://USERNAME.github.io/elabel-verify-demo/dashboard.html
-```
-
-QR mẫu:
+Link verify mẫu:
 
 ```txt
-https://USERNAME.github.io/elabel-verify-demo/verify.html?id=8938500000271&token=abc123
+https://ndducnha.github.io/elabel/verify.html?id=8938500000271&token=abc123
 ```
 
-## 2. Deploy backend
-
-Có thể dùng Render/Railway/VPS.
-
-### Render
-
-1. Tạo repo backend chứa `server.js` và `package.json`.
-2. Vào Render → New Web Service.
-3. Connect repo.
-4. Build command:
+Link dashboard:
 
 ```txt
-npm install
+https://ndducnha.github.io/elabel/dashboard.html
 ```
 
-5. Start command:
+## Quan trọng
 
-```txt
-npm start
-```
+Vì không có backend:
 
-6. Environment variables:
+- Không thu được IP thật.
+- Không có database chung.
+- Dashboard chỉ thấy dữ liệu local trên cùng trình duyệt.
+- Người khác quét QR trên điện thoại của họ thì dữ liệu nằm trên điện thoại của họ, không tự chạy về máy admin.
+- Verify rule bị lộ trong source code, chỉ phù hợp demo UI.
 
-```txt
-FRONTEND_ORIGIN=https://USERNAME.github.io
-VALID_TOKENS=abc123,demo-token,token-san-pham-001
-```
-
-Sau khi deploy, Render cho domain ví dụ:
-
-```txt
-https://elabel-verify-backend.onrender.com
-```
-
-## 3. Cấu hình frontend
-
-Trong `verify.html` và `dashboard.html`, sửa:
-
-```js
-const API_BASE = "https://YOUR-BACKEND-DOMAIN.com";
-```
-
-thành:
-
-```js
-const API_BASE = "https://elabel-verify-backend.onrender.com";
-```
-
-## 4. Dữ liệu collect
-
-Frontend collect được:
-
-- URL đang mở
-- Referrer
-- User agent
-- Ngôn ngữ trình duyệt
-- Platform/device
-- Kích thước màn hình
-- Viewport
-- Timezone
-- Client time
-- Cookie enabled
-- Online status
-- Fingerprint hash cơ bản
-- Product info embedded trong e-label
-
-Backend collect thêm:
-
-- IP
-- Server time
-- Verify status
-- Có thể bổ sung GeoIP, ASN, country, city ở backend
-
-## 5. Lưu ý
-
-- GitHub Pages chỉ host static HTML, không tự lưu database.
-- Muốn lưu dữ liệu phải có backend.
-- Dashboard không nên public nếu dùng dữ liệu thật.
-- GPS/camera phải xin quyền người dùng, không nên âm thầm lấy.
+Muốn thu dữ liệu tập trung giống Google Analytics thì bắt buộc cần backend/serverless/API.
