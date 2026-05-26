@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Dashboard</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f4f7fb;margin:0;padding:24px;color:#111827}
+    .box{max-width:1280px;margin:auto;background:#fff;border-radius:18px;padding:22px;box-shadow:0 10px 28px rgba(0,0,0,.07)}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0}
+    .card{background:#f8fafc;border-radius:14px;padding:16px}.num{font-size:30px;font-weight:800;margin-top:6px}
+    button{background:#111827;color:#fff;border:0;border-radius:10px;padding:10px 14px;cursor:pointer;margin-right:8px}
+    table{border-collapse:collapse;width:100%;min-width:1500px}th,td{border-bottom:1px solid #eee;padding:10px;text-align:left;font-size:13px;vertical-align:top}
+    th{background:#f8fafc}.tablewrap{overflow:auto}.ok{color:#047857;font-weight:700}.bad{color:#b91c1c;font-weight:700}
+    code{background:#f1f5f9;padding:2px 5px;border-radius:5px}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Verify Dashboard</h1>
+    <p>Trang này lấy dữ liệu từ backend. Không nên public dashboard nếu dữ liệu thật.</p>
+    <button onclick="loadData()">Refresh</button>
+    <button onclick="exportCSV()">Export CSV</button>
+
+    <div class="cards">
+      <div class="card">Tổng lượt<div id="total" class="num">0</div></div>
+      <div class="card">Verify OK<div id="ok" class="num">0</div></div>
+      <div class="card">Verify fail<div id="fail" class="num">0</div></div>
+      <div class="card">Visitor unique<div id="unique" class="num">0</div></div>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th><th>Status</th><th>Product</th><th>Product ID</th><th>Token</th>
+            <th>IP</th><th>Country</th><th>City</th><th>Browser/Device</th><th>Timezone</th>
+            <th>Screen</th><th>Fingerprint</th><th>Company</th><th>Origin</th><th>Ingredients</th><th>URL</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"><tr><td colspan="16">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://YOUR-BACKEND-DOMAIN.com";
+    const DASHBOARD_API_URL = API_BASE + "/api/verify-events";
+    let rows = [];
+
+    function esc(s){return String(s ?? "-").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+    function browser(ua=""){if(ua.includes("Edg"))return"Edge";if(ua.includes("Chrome"))return"Chrome";if(ua.includes("Safari")&&!ua.includes("Chrome"))return"Safari";if(ua.includes("Firefox"))return"Firefox";return"Unknown"}
+
+    async function loadData(){
+      const tbody=document.getElementById("tbody");
+      tbody.innerHTML='<tr><td colspan="16">Loading...</td></tr>';
+      try{
+        const res=await fetch(DASHBOARD_API_URL);
+        rows=await res.json();
+        if(!Array.isArray(rows)) rows=[];
+
+        document.getElementById("total").textContent=rows.length;
+        document.getElementById("ok").textContent=rows.filter(x=>x.verified).length;
+        document.getElementById("fail").textContent=rows.filter(x=>!x.verified).length;
+        document.getElementById("unique").textContent=new Set(rows.map(x=>x.visitorInfo?.visitorFingerprint).filter(Boolean)).size;
+
+        tbody.innerHTML=rows.map(x=>{
+          const p=x.productInfo||{};
+          const v=x.visitorInfo||{};
+          const b=v.browser||{};
+          const s=v.screen||{};
+          const page=v.page||{};
+          return `<tr>
+            <td>${esc(x.serverTime)}</td>
+            <td>${x.verified?'<span class="ok">OK</span>':'<span class="bad">FAIL</span>'}</td>
+            <td>${esc(p.productName)}</td>
+            <td>${esc(x.productId)}</td>
+            <td>${esc(x.token)}</td>
+            <td>${esc(x.ip)}</td>
+            <td>${esc(x.geo?.country)}</td>
+            <td>${esc(x.geo?.city)}</td>
+            <td>${esc(browser(b.userAgent))}<br><small>${esc(b.platform)}</small></td>
+            <td>${esc(v.time?.timezone)}</td>
+            <td>${esc(s.width)}x${esc(s.height)} / viewport ${esc(s.viewportWidth)}x${esc(s.viewportHeight)}</td>
+            <td><code>${esc(v.visitorFingerprint)}</code></td>
+            <td>${esc(p.responsibleCompany)}</td>
+            <td>${esc(p.origin)}</td>
+            <td>${esc(p.ingredients)}</td>
+            <td>${esc(page.url)}</td>
+          </tr>`
+        }).join("") || '<tr><td colspan="16">No data</td></tr>';
+      }catch(e){
+        tbody.innerHTML='<tr><td colspan="16">Cannot load data</td></tr>';
+      }
+    }
+
+    function exportCSV(){
+      const headers=["serverTime","verified","productName","productId","token","ip","country","city","browser","platform","timezone","fingerprint","company","origin","ingredients","url"];
+      const csv=[headers.join(",")];
+      rows.forEach(x=>{
+        const p=x.productInfo||{}, v=x.visitorInfo||{}, b=v.browser||{}, page=v.page||{};
+        const vals=[x.serverTime,x.verified,p.productName,x.productId,x.token,x.ip,x.geo?.country,x.geo?.city,browser(b.userAgent),b.platform,v.time?.timezone,v.visitorFingerprint,p.responsibleCompany,p.origin,p.ingredients,page.url]
+          .map(y=>`"${String(y??"").replaceAll('"','""')}"`);
+        csv.push(vals.join(","));
+      });
+      const blob=new Blob([csv.join("\n")],{type:"text/csv;charset=utf-8"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");a.href=url;a.download="verify-events.csv";a.click();URL.revokeObjectURL(url);
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
