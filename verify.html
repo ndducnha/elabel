@@ -166,7 +166,7 @@ async function main(){
 
   const status=document.getElementById("status");
   status.className="status "+(verified?"ok":"fail");
-  status.textContent=verified?"✅ Verify thành công":"❌ Verify thất bại";
+  status.textContent=verified?"✅ Dữ liệu đã đồng bộ về hệ thống Nhãn điện tử quốc gia":"❌ Verify thất bại";
 
   const visitor=await collectInfo();
 
